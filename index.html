@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenBioRQ: Unsolved Biomedical Research Questions for Agents</title>
+<meta name="description" content="OpenBioRQ — a retrieval-grounded agentic benchmark of 12,553 unsolved biomedical research questions that probes faithful citation and abstention.">
+<meta property="og:title" content="OpenBioRQ: Unsolved Biomedical Research Questions for Agents">
+<meta property="og:description" content="A retrieval-grounded agentic benchmark of 12,553 unsolved biomedical research questions. Existence ≠ correctness: >99% of agent citations resolve, yet ~15.9% point to the wrong paper.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;850&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+<link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <h1><span class="em">OpenBioRQ</span>: Unsolved Biomedical<br>Research Questions for Agents</h1>
+    <p class="authors"><strong>Minbyul Jeong</strong></p>
+    <p class="affil">Upstage AI &nbsp;·&nbsp; <a href="mailto:minstar@upstage.ai">minstar@upstage.ai</a></p>
+    <p class="venue">A retrieval-grounded agentic benchmark of <strong>12,553</strong> unsolved biomedical questions across <strong>12</strong> domains</p>
+    <div class="btns">
+      <a class="btn soon"><i class="fas fa-file-pdf"></i> Paper <span style="opacity:.7">(coming soon)</span></a>
+      <a class="btn" href="https://huggingface.co/datasets/Minbyul/OpenBioRQ"><i class="fas fa-database"></i> Dataset</a>
+      <a class="btn ghost" href="https://github.com/minstar/OpenBioRQ"><i class="fab fa-github"></i> Code</a>
+      <a class="btn ghost" href="#citation"><i class="fas fa-quote-right"></i> BibTeX</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== TEASER + ABSTRACT ===================== -->
+<section class="section">
+  <div class="wrap">
+    <figure>
+      <img src="static/images/fig_results_overview.png" alt="OpenBioRQ results overview">
+      <figcaption><strong>OpenBioRQ at a glance.</strong> The benchmark is hard, non-saturating, and discriminating:
+      held-out same-lineage models solve only ~17% of the hardest subset, while three independent frontier agents
+      span a wide 29–60% — and even the best leaves ~33–40% unsolved.</figcaption>
+    </figure>
+
+    <span class="kicker">Abstract</span>
+    <p class="lead">A working citation looks like proof — but the fact that a link resolves does not mean the cited
+    paper supports the claim. Current agentic models rarely <em>fabricate</em> citations (over <strong>99%</strong> resolve),
+    yet roughly <strong>15.9%</strong> link to the <strong>wrong paper</strong>. Existing benchmarks miss this failure
+    mode: when a question has a fixed answer key, a model can reproduce the expected source from that key rather than
+    independently verifying that the source supports the claim.</p>
+    <p>I introduce <strong>OpenBioRQ</strong>, a retrieval-grounded agentic benchmark of 12,553 unsolved biomedical
+    research questions across 12 domains that treats open questions as a <strong>faithfulness-and-abstention probe</strong>.
+    To my knowledge, this is the first biomedical benchmark to combine an agentic setting — where the model must issue
+    multiple tool calls — with unsolved questions that have <strong>no answer key</strong>. Openness is verified against
+    real follow-up evidence rather than a model's parametric knowledge, and difficulty is empirical: anchored on questions
+    that three open-weight reference models fail to answer. Beyond difficulty, I observe <strong>agentic collapse</strong>
+    on the hardest questions, where agents stop using their tools — and for the most collapse-prone model, blocking tools
+    entirely barely changes its score. A frozen per-question checklist raises inter-judge agreement from Spearman
+    <strong>0.35 to 0.82</strong>. OpenBioRQ targets research assistance — evidence retrieval and faithful citation — not
+    clinical decision support.</p>
+  </div>
+</section>
+
+<!-- ===================== HIGHLIGHTS ===================== -->
+<section class="section alt">
+  <div class="wrap">
+    <h2 class="title">Why <span class="em">OpenBioRQ</span>?</h2>
+    <p class="sub">Four things this benchmark does that answer-key QA cannot.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="big">no answer key</div>
+        <div class="lab">Open questions as a probe</div>
+        <p>First biomedical benchmark to pair a multi-tool agentic setting with genuinely <em>unsolved</em> questions, so a model cannot back-derive the source from a fixed key.</p>
+      </div>
+      <div class="card">
+        <div class="big">&gt;99% → 15.9%</div>
+        <div class="lab">Existence ≠ correctness</div>
+        <p>Agent citations almost always resolve, but ~1 in 7 supports a different paper than the claim. A faithfulness failure invisible to existence checks.</p>
+      </div>
+      <div class="card">
+        <div class="big">29–60%</div>
+        <div class="lab">Hard, non-saturating, discriminating</div>
+        <p>A clean capability gradient across independent frontier lineages (Gemini&nbsp;&lt;&nbsp;Opus&nbsp;&lt;&nbsp;GPT-5.5); the best agent still leaves ~33–40% unsolved.</p>
+      </div>
+      <div class="card">
+        <div class="big">tools stop paying off</div>
+        <div class="lab">Agentic collapse</div>
+        <p>On the hardest questions agents stop calling tools; for the most collapse-prone model, removing tools entirely barely changes the score.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== THE BENCHMARK ===================== -->
+<section class="section">
+  <div class="wrap">
+    <h2 class="title">The Benchmark</h2>
+    <p class="sub">12,553 questions, two openness-grounding tracks, and an empirically-defined hard core.</p>
+
+    <figure>
+      <img src="static/images/fig_pipeline.png" alt="Construction pipeline">
+      <figcaption><strong>Construction pipeline.</strong> Questions are extracted from authoritative sources, refined to
+      be self-contained, deduplicated, then openness-verified against real follow-up evidence and screened for
+      contamination — before rubric generation and agentic evaluation.</figcaption>
+    </figure>
+
+    <h3>Provenance, not just "open"</h3>
+    <p>"Open" is a <strong>provenance</strong> claim: every question is sourced from a genuinely unresolved research
+    front, grounded two ways —</p>
+    <ul class="clean">
+      <li><strong>Retrieval-verified</strong> — PubMed / trial / arXiv questions whose <span class="inline">open_status</span> is judged from real follow-up evidence (citing papers, trial results), not a model's memory of the source's framing.</li>
+      <li><strong>Expert-consensus</strong> — JLA Priority Setting Partnerships and NICE research recommendations: questions declared open by expert/consensus process.</li>
+    </ul>
+
+    <h3>Empirical difficulty &amp; the frozen core</h3>
+    <p>Difficulty is not self-rated. Each question is answered, with tools, by three open-weight reference models; the
+    pass/fail pattern defines difficulty. The <strong>full core (657)</strong> is the all-fail set; the
+    <strong>frozen core (423)</strong> is the subset all three reference models fail at temperature&nbsp;0 — the primary
+    discriminating hard split.</p>
+
+    <figure>
+      <img src="static/images/fig_taxonomy.png" alt="Taxonomy across 12 domains">
+      <figcaption><strong>12 biomedical domains.</strong> The frozen core spans every domain (largest shares Clinical
+      Medicine, Neuroscience &amp; Psychiatry, Oncology) — not a single-specialty benchmark.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===================== EVALUATION ===================== -->
+<section class="section alt">
+  <div class="wrap">
+    <h2 class="title">Evaluation Protocol</h2>
+    <p class="sub">Agentic multi-round tool use, graded by a frozen per-question checklist.</p>
+
+    <figure class="fig-narrow">
+      <img src="static/images/fig_eval_flow.png" alt="Evaluation flow">
+      <figcaption><strong>Agentic evaluation.</strong> A model answers each question with multi-round access to 10 real
+      biomedical APIs, and the answer is graded criterion-by-criterion against a frozen rubric.</figcaption>
+    </figure>
+
+    <h3>10 medical tools, no answer key</h3>
+    <p>Models call real REST APIs — <span class="inline">pubmed</span>, <span class="inline">clinicaltrialsgov</span>,
+    <span class="inline">openfda</span>, <span class="inline">opentargets</span>, <span class="inline">chembl</span>,
+    <span class="inline">uniprot</span>, <span class="inline">pubchem</span>, <span class="inline">kegg</span>,
+    <span class="inline">ncbi_datasets</span>, <span class="inline">biomcp</span> — and must synthesize evidence themselves.</p>
+
+    <h3>Checklist scoring</h3>
+    <p>A free-form judge had high variance on open answers. A frozen per-question checklist
+    (<span class="inline">must_mention / must_acknowledge / must_ground / must_avoid</span>) graded
+    met&nbsp;/&nbsp;partial&nbsp;/&nbsp;not&nbsp;met raises inter-judge agreement from <strong>Spearman 0.35 to 0.82</strong>;
+    a question is "solved" at score&nbsp;≥&nbsp;0.5.</p>
+  </div>
+</section>
+
+<!-- ===================== RESULTS ===================== -->
+<section class="section">
+  <div class="wrap">
+    <h2 class="title">Key Results</h2>
+    <p class="sub">A capability gradient across independent lineages — and failure modes that answer-key QA hides.</p>
+
+    <h3>Leaderboard — frozen core (423), T=0, checklist judge</h3>
+    <table class="tbl">
+      <thead><tr><th>Model</th><th>Role / lineage</th><th class="num">Frozen-core solve@0.5</th></tr></thead>
+      <tbody>
+        <tr class="grp"><td colspan="3">Reference roster (difficulty anchors)</td></tr>
+        <tr><td>GLM-5.1 · Qwen3.6 · DeepSeek-V4</td><td>open-weight roster</td><td class="num">0%<span class="note"> *</span></td></tr>
+        <tr class="grp"><td colspan="3">Held-out (same lineage)</td></tr>
+        <tr><td>Qwen3-235B-A22B</td><td>older generation</td><td class="num">2.1%</td></tr>
+        <tr><td>GLM-5</td><td>held-out</td><td class="num">16.6%</td></tr>
+        <tr><td>Qwen3.5-397B-A17B</td><td>held-out</td><td class="num">16.8%</td></tr>
+        <tr class="grp"><td colspan="3">Independent frontier lineages</td></tr>
+        <tr><td>Gemini-3-Pro</td><td>Google</td><td class="num">28.8%</td></tr>
+        <tr><td>Opus-4.7</td><td>Anthropic</td><td class="num">37.8%</td></tr>
+        <tr><td>GPT-5.5</td><td>OpenAI</td><td class="num best">59.6%</td></tr>
+      </tbody>
+    </table>
+    <p class="note">* The frozen core is the subset all three roster models fail by construction, so their solve rate is 0%
+    by definition. Full-core (657) frontier solve@0.5: Gemini 37.4% · Opus 48.6% · GPT-5.5 66.7%.</p>
+
+    <h3>Existence ≠ correctness</h3>
+    <figure>
+      <img src="static/images/fig_citation.png" alt="Two-level citation factuality">
+      <figcaption><strong>Two-level citation audit.</strong> Citations almost always <em>exist</em> (fabrication ≈0.7%),
+      but ~15.9% are <strong>wrong-paper</strong> (a real paper that does not support the claim) — confirmed under an
+      independent different-family judge (cross-family κ = 0.755).</figcaption>
+    </figure>
+
+    <h3>Tools stop paying off where they are needed most</h3>
+    <figure>
+      <img src="static/images/fig_behavioral.png" alt="Agentic collapse behavior">
+      <figcaption><strong>Agentic collapse.</strong> On the hardest questions, agents stop issuing tool calls. For the
+      most collapse-prone model, blocking tool access entirely barely changes the score — tool access confers no
+      <em>measurable</em> advantage (confidence intervals overlap), replicated across lineages.</figcaption>
+    </figure>
+
+    <h3>Measures what closed-form medical QA cannot</h3>
+    <figure>
+      <img src="static/images/fig_orthogonality.png" alt="OpenBioRQ vs MedQA orthogonality">
+      <figcaption><strong>Resolution gap.</strong> On closed-form MedQA / PubMedQA / MedMCQA the same models compress
+      into a ~6-point band, while OpenBioRQ spreads 0→60% (Spearman ≈ 0.14). Models within 0.2&nbsp;pt on MedQA can be
+      4× apart on OpenBioRQ — heterogeneity that saturated MC benchmarks hide.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===================== DATA ACCESS ===================== -->
+<section class="section alt">
+  <div class="wrap">
+    <h2 class="title">Data &amp; Predictions</h2>
+    <p class="sub">Evaluation sets, rubrics, and per-model agent trajectories — released for reproducibility.</p>
+    <p>The 🤗 <a href="https://huggingface.co/datasets/Minbyul/OpenBioRQ">Hugging Face release</a> ships the full core
+    (657) and frozen core (423) with <span class="inline">gold_answer</span>, the per-question rubrics, and
+    <strong>per-model predictions + judge verdicts</strong> for all 11 leaderboard models (full agentic trajectories), so
+    every leaderboard number can be re-derived end to end.</p>
+<pre><code>from datasets import load_dataset
+
+# 423-question frozen core (the primary hard split)
+frozen = load_dataset("Minbyul/OpenBioRQ", data_files="frozen_core_423.jsonl")["train"]
+
+# per-question grading rubrics (join on task_id)
+rubrics = load_dataset("Minbyul/OpenBioRQ", data_files="rubrics.jsonl")["train"]
+
+# a model's agent trajectories + judge verdicts
+preds = load_dataset("Minbyul/OpenBioRQ",
+                     data_files="predictions/gpt-5.5/predictions.jsonl")["train"]</code></pre>
+  </div>
+</section>
+
+<!-- ===================== CITATION ===================== -->
+<section class="section" id="citation">
+  <div class="wrap">
+    <h2 class="title">Citation</h2>
+    <p class="sub">If you use OpenBioRQ, please cite:</p>
+<pre><code>@misc{jeong2026openbiorq,
+  title         = {OpenBioRQ: Unsolved Biomedical Research Questions for Agents},
+  author        = {Minbyul Jeong},
+  year          = {2026},
+  howpublished  = {\url{https://huggingface.co/datasets/Minbyul/OpenBioRQ}},
+  note          = {Dataset and benchmark}
+}</code></pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><strong>OpenBioRQ</strong> · Minbyul Jeong, Upstage AI ·
+      <a href="https://huggingface.co/datasets/Minbyul/OpenBioRQ">Dataset</a> ·
+      <a href="https://github.com/minstar/OpenBioRQ">Code</a></p>
+    <p>OpenBioRQ targets research assistance (evidence retrieval and faithful citation), not clinical decision support.
+    Questions derive from open-access literature and public clinical-trial registries; provenance is retained in each record.</p>
+  </div>
+</footer>
+
+</body>
+</html>
